@@ -1,6 +1,6 @@
 # docker-ssh
 
-A container from Ubuntu 12.04 with supervisord and openssh-server preinstalled to be used as a base image. A fork of [sullof/docker-sshd](https://github.com/sullof/docker-sshd). Mine includes .conf files added to the /etc/supervisor/conf.d directory. This seems neater than appending to the supervisord.conf file.
+A container from Ubuntu 12.04 with supervisord and openssh-server preinstalled to be used as a base image for other services. A mash up of [sullof/docker-sshd](https://github.com/sullof/docker-sshd) and [zumbrunnen/docker-base](https://github.com/zumbrunnen/docker-base). This one includes .conf files added to the /etc/supervisor/conf.d directory. This seems neater than appending to the supervisord.conf file.
 
 ## Installation
 
