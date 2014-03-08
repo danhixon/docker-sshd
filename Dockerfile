@@ -1,16 +1,18 @@
-FROM ubuntu:12.04
-MAINTAINER Francesco Sullo, sullof@sullof.com, http://sullof.com
+FROM zumbrunnen/base
 
-RUN apt-get update && apt-get upgrade
-RUN apt-get install -y openssh-server python-setuptools && /usr/bin/easy_install supervisor
+ENV DEBIAN_FRONTEND noninteractive
 
-ADD adds/authorized_keys /authorized_keys
-ADD adds/configure.sh /configure.sh
+RUN apt-get -qq update
+RUN apt-get -yqq upgrade
+RUN apt-get -yqq install openssh-server
+
+ADD authorized_keys /authorized_keys
+ADD configure.sh /configure.sh
 RUN bin/bash /configure.sh && rm /configure.sh
 
-ADD adds/supervisord.conf /etc/supervisord.conf
+ADD supervisor.conf /etc/supervisor/conf.d/sshd.conf
 
 EXPOSE 22
 
-CMD ["/usr/local/bin/supervisord","-n"]
+CMD ["/usr/bin/supervisord","-n"]
 

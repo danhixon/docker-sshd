@@ -1,60 +1,46 @@
 # docker-ssh
 
-A container from Ubuntu 12.04 with openssh-server preinstalled to be used as a base image.
-Inspired by [docker-wordpress-nginx](https://github.com/eugeneware/docker-wordpress-nginx) container by [Eugene Ware](http://eugeneware.com).
+A container from Ubuntu 12.04 with supervisord and openssh-server preinstalled to be used as a base image. A fork of [sullof/docker-sshd](https://github.com/sullof/docker-sshd). Mine includes .conf files added to the /etc/supervisor/conf.d directory. This seems neater than appending to the supervisord.conf file.
 
 ## Installation
 
-```bash
-$ git clone https://github.com/sullof/docker-sshd.git
-$ cd docker-sshd
-```
+	$ git clone https://github.com/danhixon/docker-sshd.git
+	$ cd docker-sshd
+
 Substitute the current ```authorized_keys``` file with your public key. If not, potentially, I could access your container : )
 If you prefer to use a password, comment the keys block 
 
 ## Usage
 
-Build the container:
-```bash
-$ sudo docker build -t sullof/sshd .
-```
-It's better if you change the tag using your Docker username.
+Build the container: ```$ sudo docker build -t <username>/sshd .```
+Use your Docker username.
 
-To spawn a new instance and see the IP:
+To spawn a new instance and connect:
 
-```bash
-$ CONTAINER_ID=$(sudo docker run -d docker-ssh)
-$ sudo docker inspect $CONTAINER_ID | grep IPAddress | awk '{ print $2 }' | tr -d ',"'
-```
-You will have a result like this:
-```
-172.17.0.74
-```
-And, finally, you should connect to the container with 
-```bash
-$ ssh root@172.17.0.74
-```
+	$ sudo docker run -p 22 -d <username>/docker-ssh
+	$ docker ps
+	CONTAINER ID        IMAGE                         COMMAND             CREATED              STATUS              PORTS                   NAMES
+	e13e48deeb4a        danhixon/docker-sshd:latest   /bin/bash           About a minute ago   Up About a minute   0.0.0.0:49153->22/tcp   grave_lovelace   
+	$ ssh root@localhost -p 49153
+	root@0a3739387477:~# echo "I made it."
 
-## What after?
+If you are running docker on OSX you must remember that this port is only mapped on the boot2docker instance and will not be accessible from OSX.
+
+## What next?
 
 You can create new images starting your Dockerfile with something like
-```
-FROM sullof/sshd
-```
-and modify appropriately the ```supervisord.conf``` file without overwriting the previous one. For example, in your derivated images, you 
-could use the following approach appending a new file:
-```bash
-$ ADD ./supervisord.conf.append /etc/supervisord.conf.append
-$ RUN cat /etc/supervisord.conf.append >> /etc/supervisord.conf &&\
-      rm /etc/supervisord.conf.append
-```
-There is an example at [docker-wpngx](https://github.com/sullof/docker-wpngx).
+
+	FROM danhixon/sshd
+
+and add any *.conf files you wish to the /etc/supervisor/conf.d/ directory:
+
+    ADD supervisor.conf /etc/supervisor/conf.d/rails.conf
 
 ## License 
 
 (The MIT License)
 
-Copyright (c) 2013 Francesco Sullo <sullof@sullof.com>
+Copyright (c) 2013 Dan Hixon <danhixon@gmail.com>
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
