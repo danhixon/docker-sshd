@@ -2,39 +2,35 @@
 
 A container from Ubuntu 12.04 with supervisord and openssh-server preinstalled to be used as a base image for other services. A mash up of [sullof/docker-sshd](https://github.com/sullof/docker-sshd) and [zumbrunnen/docker-base](https://github.com/zumbrunnen/docker-base). This one includes .conf files added to the /etc/supervisor/conf.d directory. This seems neater than appending to the supervisord.conf file.
 
-## Installation
-
-	$ git clone https://github.com/danhixon/docker-sshd.git
-	$ cd docker-sshd
-
-Substitute the current ```authorized_keys``` file with your public key. If not, potentially, I could access your container : )
-If you prefer to use a password, comment the keys block 
-
 ## Usage
 
-Build the container: ```$ sudo docker build -t <username>/sshd .```
-Use your Docker username.
+	$ docker pull danhixon/docker-sshd
+	  # grant access to my public key
+	$ docker run -d -e AUTHORIZED_KEYS="$(cat ~/.ssh/id_rsa.pub)" danhixon/docker-sshd
+	  # grant access to all the public keys in the authorized_keys file:
+	$ docker run -d -p 372999:22 -e AUTHORIZED_KEYS="$(cat ~/.ssh/authorized_keys)" danhixon/docker-sshd
 
-To spawn a new instance and connect:
+Include whatever public keys you want to allow ssh access. The above command will copy the authorized_keys of the host to the docker container. Be sure to map a port for it if you want to access it from outside the docker host.
 
-	$ sudo docker run -p 22 -d <username>/docker-ssh
+Here's how you connect:
+
 	$ docker ps
 	CONTAINER ID        IMAGE                         COMMAND             CREATED              STATUS              PORTS                   NAMES
-	e13e48deeb4a        danhixon/docker-sshd:latest   /bin/bash           About a minute ago   Up About a minute   0.0.0.0:49153->22/tcp   grave_lovelace   
-	$ ssh root@localhost -p 49153
-	root@0a3739387477:~# echo "I made it."
+	e13e48deeb4a        danhixon/docker-sshd:latest   /bin/bash           About a minute ago   Up About a minute   0.0.0.0:372999->22/tcp   grave_lovelace   
+	$ ssh root@localhost -p 372999
+	root@0a3739387477:~# echo "Hooray. I made it."
 
-If you are running docker on OSX you must remember that this port is only mapped on the boot2docker instance and will not be accessible from OSX.
+If you are running docker on OSX you must remember that the mapped port is only mapped on the boot2docker instance and will not be accessible from OSX.
 
 ## What next?
 
 You can create new images starting your Dockerfile with something like
 
-	FROM danhixon/sshd
+	FROM danhixon/docker-sshd
 
-and add any *.conf files you wish to the /etc/supervisor/conf.d/ directory:
+and add any *.conf files you wish to the /etc/supervisor/conf.d/ directory. For example:
 
-    ADD supervisor.conf /etc/supervisor/conf.d/rails.conf
+  ADD supervisor.conf /etc/supervisor/conf.d/rails.conf
 
 ## License 
 
