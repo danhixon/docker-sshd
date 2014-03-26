@@ -3,7 +3,6 @@ FROM zumbrunnen/base
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get -qq update
-RUN apt-get -yqq upgrade
 RUN apt-get -yqq install openssh-server
 
 ADD start_sshd.sh /start_sshd.sh
